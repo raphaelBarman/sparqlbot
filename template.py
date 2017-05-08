@@ -1,10 +1,11 @@
 
 # Templates page generation
-mention_entry_template = '[[{date}]]. [[Mention]] de [[{nom}]] en tant que [[{fonction}]] [[{nation}]], dans [[{journal}]] [{ref}]'
+mention_entry_template = '* [[{date}]] / -. [[Mention]] de [[{name}]] en tant que [[{function}]], dans [[{journal}]] [{ref}]'
 
 page_template = """
 Page générée automatiquement par le bot sparql
 
+== Mentions ==
 {entries}
 
 """

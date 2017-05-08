@@ -9,6 +9,7 @@ sparql.setReturnFormat(JSON)
 
 journals = {'JDG': "Journal de Genève", "GDL": "Gazette de Lausanne"}
 
+
 # Executes a query on the sparql endpoint and returns a flattened list of results
 def execute_query(query):
     sparql.setQuery(query)
@@ -34,9 +35,11 @@ def id2url(artComp, solrId):
 # Cleans a person name
 def cleanName(name):
     # We remove every character followed by a '.'
-    return re.sub('.\.','',name).title().strip()
+    return re.sub('.\.', '', name).title().strip()
+
 
 persons = {}
+
 
 # Adds a mention for a person
 def addMention(mention):
@@ -51,16 +54,15 @@ def addMention(mention):
     persons[person].append(mention)
 
 
-
 query = """
 SELECT STR(?name) AS ?personName STR(?functionType) AS ?functiontype WHERE
 {
-?pm a lt-owl:PersonMention .
-?pm lt-owl:name ?name .
-?pm lt-owl:functionType ?functionType .
-?pm lt-owl:nationality ?nationality .
-FILTER (!contains(?functionType, "other"))
-FILTER (contains(lcase(str(?nationality)), "suisse"))
+        ?pm a lt-owl:PersonMention .
+        ?pm lt-owl:name ?name .
+        ?pm lt-owl:functionType ?functionType .
+        ?pm lt-owl:nationality ?nationality .
+        FILTER (!contains(?functionType, "other"))
+        FILTER (contains(lcase(str(?nationality)), "suisse"))
 }
 LIMIT 100
 """
@@ -85,11 +87,14 @@ WHERE
 # For each person found
 for res in execute_query(query):
     # For each article mentioning the person
-    for article in execute_query(query2%(res['personName'])):
-        article['ref'] = urllib.parse.quote(id2url(article['artComp'],article['solrId']) + "/" + cleanName(article['name'])).replace(r'%3A',':')
+    for article in execute_query(query2 % (res['personName'])):
+        article['ref'] = urllib.parse.quote(
+            id2url(article['artComp'], article['solrId']) + "/" +
+            cleanName(article['name'])).replace(r'%3A', ':')
         article['journal'] = journals[article['journal']]
         article['nation'] = 'suisse'
-        article['date'] = re.sub(r"(....)-(..)-(..).*",r'\1.\2.\3',article['date'])
+        article['date'] = re.sub(r"(....)-(..)-(..).*", r'\1.\2.\3',
+                                 article['date'])
         del article['artComp']
         del article['solrId']
         addMention(article)
@@ -99,7 +104,4 @@ for person, mentions in persons.items():
     persons[person] = sorted(mentions, key=lambda k: k['date'])
 
 with io.open('persons.json', 'w', encoding='utf-8') as file:
-    json.dump(persons,file, ensure_ascii=False)
-
-
-
+    json.dump(persons, file, ensure_ascii=False)
