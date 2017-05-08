@@ -1,1 +1,3 @@
 SPARQLWrapper>=1.7.6
+beautifulsoup4
+lxml
