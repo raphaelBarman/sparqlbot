@@ -1,5 +1,8 @@
 import urllib
 import requests
+import json
+import template
+
 from bs4 import BeautifulSoup
 
 from login import user
@@ -67,7 +70,8 @@ def get_page_content(page_name):
     # soup=BeautifulSoup(result.text)
     code = ''
     for primitive in soup.findAll("text"):
-        code += primitive.string
+        if primitive.string:
+            code += primitive.string
     print(code)
     return code
 
@@ -75,3 +79,15 @@ def get_page_content(page_name):
 def append_to_page(page_name, content, summary):
     actual_content = get_page_content(page_name)
     commit_changes_to_page(page_name, actual_content+content, summary)
+
+
+def push_pages_from_json(jsonfile, force = False):
+    with open(jsonfile, 'r') as f:
+        peoples = json.load(f)
+        for pname, mentions in peoples.items():
+            if force or len(get_page_content(pname)) == 0:
+                content = template.make_person_page(mentions)
+                commit_changes_to_page(pname, content, "edited by sparql bot")
+
+
+push_pages_from_json('persons.json',True)

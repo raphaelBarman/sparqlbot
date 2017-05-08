@@ -24,8 +24,8 @@ def id2url(artComp, solrId):
         journal, year, month, day, page, solrId)
     return url
 
-persons = {}
 
+persons = {}
 
 query = """
 SELECT STR(?id) as ?id STR(?issue) AS ?journal STR(?date) AS ?date STR(?name) AS ?personName STR(?firstname) AS ?firstname STR(?lastname) AS ?lastname STR(?function) AS ?function STR(?functionType) AS ?functiontype STR(?nationality) AS ?nationality ?artComp ?solrId
@@ -33,8 +33,8 @@ WHERE
 {
 ?pm a lt-owl:PersonMention .
 ?pm lt-owl:name ?name .
-OPTIONAL {?pm lt-owl:firstname ?firstname }  
-OPTIONAL {?pm lt-owl:lastname ?lastname } 
+OPTIONAL {?pm lt-owl:firstname ?firstname }
+OPTIONAL {?pm lt-owl:lastname ?lastname }
 ?pm lt-owl:function ?function .
 ?pm lt-owl:functionType ?functionType .
 ?pm lt-owl:nationality ?nationality .
@@ -67,12 +67,12 @@ WHERE
 }
 """
 for res in execute_query(query):
-    print(query2%(res['personName']))
-    res['articles'] = execute_query(query2%(res['personName']))
+    print(query2 % (res['personName']))
+    res['articles'] = execute_query(query2 % (res['personName']))
     print(len(res['articles']))
     functions = set()
     for article in res['articles']:
-        print(id2url(article['artComp'],article['solrId']))
-        functions.add((article['f'].title(),article['functionType']))
+        print(id2url(article['artComp'], article['solrId']))
+        functions.add((article['f'].title(), article['functionType']))
     print(functions)
-    #print(id2url(res['artComp'],res['solrId']))
+    # print(id2url(res['artComp'],res['solrId']))
