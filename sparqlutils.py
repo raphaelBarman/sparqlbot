@@ -1,8 +1,9 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import re
 
-sparql=SPARQLWrapper("http://iccluster052.iccluster.epfl.ch:8899/sparql")
+sparql = SPARQLWrapper("http://iccluster052.iccluster.epfl.ch:8899/sparql")
 sparql.setReturnFormat(JSON)
+
 
 def execute_query(query):
     sparql.setQuery(query)
@@ -14,9 +15,13 @@ def execute_query(query):
         results.append(resultDict)
     return results
 
+
 def id2url(artComp, solrId):
-    journal,day,month,year,page = re.sub(r"http://localhost:8080/letemps-data/(...)_(.*?)-(.*?)-(.*?)_Ar0(..).*",r'\1;\2;\3;\4;\5',artComp).split(';')
-    url = "http://www.letempsarchives.ch/page/%s_%s_%s_%s/%s/article/%s"%(journal,year,month,day,page,solrId)
+    journal, day, month, year, page = re.sub(
+        r"http://localhost:8080/letemps-data/(...)_(.*?)-(.*?)-(.*?)_Ar0(..).*",
+        r'\1;\2;\3;\4;\5', artComp).split(';')
+    url = "http://www.letempsarchives.ch/page/%s_%s_%s_%s/%s/article/%s" % (
+        journal, year, month, day, page, solrId)
     return url
 
 
@@ -35,6 +40,4 @@ WHERE
 }
 LIMIT 100
 """):
-    print(id2url(res['artComp'],res['solrId']))
-
-
+    print(id2url(res['artComp'], res['solrId']))

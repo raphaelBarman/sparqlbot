@@ -40,10 +40,10 @@ edit_cookie.update(r3.cookies)
 
 
 def commit_changes_to_page(page_name, content, summary):
-    name_ngv = page_name.lower().replace(" ", "%20")
-    content += '[http://dhlabsrv4.epfl.ch/ngviewer.php?mode=1&req_1=' + \
-        name_ngv + ' ' + page_name + ']\n'
-    content += '=== Archives Le Temps ===\n'
+    # name_ngv = page_name.lower().replace(" ", "%20")
+    # content += '[http://dhlabsrv4.epfl.ch/ngviewer.php?mode=1&req_1=' + \
+    #    name_ngv + ' ' + page_name + ']\n'
+    # content += '=== Archives Le Temps ===\n'
     # save action
     payload = {
         'action': 'edit',
@@ -70,3 +70,8 @@ def get_page_content(page_name):
         code += primitive.string
     print(code)
     return code
+
+
+def append_to_page(page_name, content, summary):
+    actual_content = get_page_content(page_name)
+    commit_changes_to_page(page_name, actual_content+content, summary)
