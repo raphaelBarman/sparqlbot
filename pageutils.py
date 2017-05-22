@@ -2,6 +2,9 @@ import urllib
 import requests
 import json
 import template
+import io
+import os
+
 
 from bs4 import BeautifulSoup
 
@@ -72,7 +75,6 @@ def get_page_content(page_name):
     for primitive in soup.findAll("text"):
         if primitive.string:
             code += primitive.string
-    print(code)
     return code
 
 
@@ -80,14 +82,28 @@ def append_to_page(page_name, content, summary):
     actual_content = get_page_content(page_name)
     commit_changes_to_page(page_name, actual_content+content, summary)
 
+personsAdded = set()
+if(os.path.isfile('personsAdded.json')):
+    with io.open('personsAdded.json', 'r', encoding='utf-8') as file:
+        personsAdded = set(json.load(file))
+initLen = len(personsAdded)
 
 def push_pages_from_json(jsonfile, force = False):
+    global personsAdded
     with open(jsonfile, 'r') as f:
         peoples = json.load(f)
-        for pname, mentions in peoples.items():
-            if force or len(get_page_content(pname)) == 0:
-                content = template.make_person_page(mentions)
-                commit_changes_to_page(pname, content, "edited by sparql bot")
+        print("There is %d"%len(peoples.keys()))
+        for pname in sorted(peoples, key=lambda k: len(peoples[k]), reverse=True):
+            if(len(personsAdded)-initLen >= 100): break
+            mentions = peoples[pname]
+            if(not "De" in pname.split(' ')[0] and pname not in personsAdded):
+                print("Import %s with %d entries"%(pname, len(mentions)))
+                if force or len(get_page_content(pname)) == 0:
+                    personsAdded.add(pname)
+                    content = template.make_person_page(mentions)
+                    commit_changes_to_page(pname, content, "edited by sparql bot")
+        print("Imported %d persons in the wiki"%len(list(personsAdded)))
+        with io.open('personsAdded.json', 'w', encoding='utf-8') as file:
+            json.dump(list(personsAdded), file, ensure_ascii=False)
 
-
-push_pages_from_json('persons.json',True)
+push_pages_from_json('persons.json')
